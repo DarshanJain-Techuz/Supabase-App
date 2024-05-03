@@ -1,9 +1,9 @@
-import DeployButton from "@/components/DeployButton";
 import AuthButton from "@/components/AuthButton";
 import { createClient } from "@/utils/supabase/server";
 import FetchDataSteps from "@/components/tutorial/FetchDataSteps";
 import Header from "@/components/Header";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 export default async function ProtectedPage() {
   const supabase = createClient();
@@ -25,7 +25,7 @@ export default async function ProtectedPage() {
         </div>
         <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
           <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
-            <DeployButton />
+            <Image src='/Logo.svg' alt='company logo' width={150} height={150} />
             <AuthButton />
           </div>
         </nav>

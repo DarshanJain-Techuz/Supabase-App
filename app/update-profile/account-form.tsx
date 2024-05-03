@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { type User } from '@supabase/supabase-js'
 import Avatar from './avatar'
+import Link from 'next/link'
 
 export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient()
@@ -17,7 +18,7 @@ export default function AccountForm({ user }: { user: User | null }) {
       setLoading(true)
       const { data, error, status } = await supabase
         .from('profiles')
-        .select(`contact_no, username, website, avatar_url, bio`)
+        .select(`contact_no, user_name, website, avatar_url, bio`)
         .eq('id', user?.id)
         .single()
 
@@ -29,7 +30,7 @@ export default function AccountForm({ user }: { user: User | null }) {
       if (data) {
         setContactNumber(data.contact_no)
         setBio(data.bio)
-        setUsername(data.username)
+        setUsername(data.user_name)
         setAvatarUrl(data.avatar_url)
       }
     } catch (error) {
@@ -53,9 +54,9 @@ export default function AccountForm({ user }: { user: User | null }) {
         contact_no: contactNumber,
         bio,
         avatar_url: url,
+        user_name: username
       })
       if (error) throw error
-      alert('Profile updated!')
     } catch (error) {
       console.log('error', error)
       alert('Error updating the data!')
@@ -66,7 +67,32 @@ export default function AccountForm({ user }: { user: User | null }) {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-md p-8 mt-10">
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-20">
+          <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-20 w-20"></div>
+        </div>
+      )}
+      <Link
+        href="/"
+        className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1"
+        >
+          <polyline points="15 18 9 12 15 6" />
+        </svg>{" "}
+        Back
+      </Link>
+      <div className="bg-white rounded-lg shadow-md p-8 mt-10 w-1/2 mx-auto">
         <Avatar
           uid={user?.id ?? null}
           url={avatar_url}

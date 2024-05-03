@@ -5,18 +5,23 @@ import { redirect } from "next/navigation";
 
 export default async function AuthButton() {
   const supabase = createClient();
-  const signOut = async () => {
-    "use server";
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
 
+  // const { data } = await supabase
+  //   .from('profiles')
+  //   .select(`avatar_url`)
+  //   .eq('id', user?.id)
+  //   .single()
+
+  const signOut = async () => {
+    'use server'
     const supabase = createClient();
     await supabase.auth.signOut();
     return redirect("/login");
   };
 
-
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
   return user ? (
     <>
       <div className="flex items-center gap-4">
