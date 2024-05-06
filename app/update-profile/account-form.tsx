@@ -4,9 +4,11 @@ import { createClient } from '@/utils/supabase/client'
 import { type User } from '@supabase/supabase-js'
 import Avatar from './avatar'
 import Link from 'next/link'
+import { useRouter } from "next/navigation";
 
 export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient()
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [contactNumber, setContactNumber] = useState<string | null>(null)
   const [bio, setBio] = useState('')
@@ -57,6 +59,7 @@ export default function AccountForm({ user }: { user: User | null }) {
         user_name: username
       })
       if (error) throw error
+      router.push("/")
     } catch (error) {
       console.log('error', error)
       alert('Error updating the data!')
