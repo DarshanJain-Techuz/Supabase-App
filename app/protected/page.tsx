@@ -4,6 +4,7 @@ import FetchDataSteps from "@/components/tutorial/FetchDataSteps";
 import Header from "@/components/Header";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 export default async function ProtectedPage() {
   const supabase = createClient();
@@ -25,7 +26,7 @@ export default async function ProtectedPage() {
         </div>
         <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
           <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
-            <Image src='/Logo.svg' alt='company logo' width={150} height={150} />
+            <Link href='/'><Image src='/Logo.svg' alt='company logo' width={150} height={150} /></Link>
             <AuthButton />
           </div>
         </nav>
