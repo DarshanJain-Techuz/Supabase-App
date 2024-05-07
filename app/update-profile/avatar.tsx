@@ -25,14 +25,12 @@ export default function Avatar({
                 if (error) {
                     throw error
                 }
-
                 const url = URL.createObjectURL(data)
                 setAvatarUrl(url)
             } catch (error) {
                 console.log('Error downloading image: ', error)
             }
         }
-
         if (url) downloadImage(url)
     }, [url, supabase])
 
@@ -64,50 +62,41 @@ export default function Avatar({
     }
 
     return (
-        <div style={{ position: 'relative', display: 'inline-block', textAlign: 'center' }}>
-            <Image
-                width={size}
-                height={size}
-                src={avatarUrl ? avatarUrl : '/user-profile-icon.jpg'}
-                alt="Avatar"
-                className="avatar image"
-                style={{
-                    height: size,
-                    width: size,
-                    borderRadius: '50%', // Makes the avatar circular
-                    objectFit: 'cover', // Ensures the image covers the area without stretching
-                    backgroundColor: '#f0f0f0', // Background color for the avatar
-                    padding: '2px', // Adds some padding around the avatar
-                    border: '1px solid #ccc', // Adds a border around the avatar
-                    display: 'inline-block', // Ensure the image is displayed inline
-                    verticalAlign: 'middle',
-                }}
-            />
-            <label
-                htmlFor="avatar-upload"
-                style={{
-                    position: 'absolute',
-                    bottom: '4px',
-                    right: '4px',
-                    cursor: 'pointer',
-                    display: 'inline-block' // Ensure the label is displayed inline
-                }}
-            >
-                <input id="avatar-upload" type="file" style={{ display: 'none' }} onChange={uploadAvatar} disabled={uploading} />
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    stroke="#007bff"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+        <div className="flex justify-center items-center relative mb-3">
+            <div className="relative">
+                <Image
+                    width={size}
+                    height={size}
+                    src={avatarUrl ? avatarUrl : '/user-profile-1.png'}
+                    alt="Avatar"
+                    className="avatar image"
+                    style={{
+                        height: size,
+                        width: size,
+                        borderRadius: '50%', // Makes the avatar circular
+                        objectFit: 'cover', // Ensures the image covers the area without stretching
+                        backgroundColor: '#f0f0f0', // Background color for the avatar
+                        padding: '2px', // Adds some padding around the avatar
+                        border: '1px solid #ccc', // Adds a border around the avatar
+                        verticalAlign: 'middle',
+                        marginLeft: 'auto',
+                        marginRight: 'auto', // Center the avatar horizontally
+                    }}
+                />
+                <label
+                    htmlFor="avatar-upload"
+                    style={{
+                        position: 'absolute',
+                        bottom: '20px',
+                        right: '0',
+                        transform: 'translate(50%, 50%)', // Move label 50% of its own width and height, centering it within the avatar
+                        cursor: 'pointer',
+                    }}
                 >
-                    <path d="M14 2L4 12h.01l6.99 7.01L21 9l-1.99-2L8 17 6 22l5-2 5-5 5-5-7-7z" />
-                </svg>
-            </label>
+                    <input id="avatar-upload" type="file" style={{ display: 'none' }} onChange={uploadAvatar} disabled={uploading} />
+                    <Image src='/edit-icon.png' alt='edit image' width={50} height={50} />
+                </label>
+            </div>
         </div>
     )
 }

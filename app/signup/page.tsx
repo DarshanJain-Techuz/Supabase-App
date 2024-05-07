@@ -4,28 +4,32 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "./submit-button";
 
-export default function Login({
+export default function SignUp({
   searchParams,
 }: {
   searchParams: { message: string };
 }) {
-  const signIn = async (formData: FormData) => {
+  const signUp = async (formData: FormData) => {
     "use server";
+
+    const origin = headers().get("origin");
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    const name = formData.get("name") as string;
     const supabase = createClient();
 
-    const { data: { user }, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${origin}/auth/callback`,
+        data: {
+          name
+        }
+      },
     });
 
-    if (error) {
-      return redirect("/login?message=Could not authenticate user");
-    }
-    const { data } = await supabase.from('user_subscriptions').
-      select(`subscription_id`).eq('id', user?.id)
-    return redirect(data?.length ? "/dashboard" : "/manage-subscriptions");
+    return redirect("/login");
   };
 
   return (
@@ -52,6 +56,15 @@ export default function Login({
       </Link>
 
       <form className="animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground">
+        <label className="text-md" htmlFor="name">
+          Full Name
+        </label>
+        <input
+          className="rounded-md px-4 py-2 bg-inherit border mb-6"
+          name="name"
+          placeholder="John Doe"
+          required
+        />
         <label className="text-md" htmlFor="email">
           Email
         </label>
@@ -72,11 +85,11 @@ export default function Login({
           required
         />
         <SubmitButton
-          formAction={signIn}
+          formAction={signUp}
           className="bg-green-700 rounded-md px-4 py-2 text-foreground mb-2"
-          pendingText="Signing In..."
+          pendingText="Signing Up..."
         >
-          Sign In
+          Sign Up
         </SubmitButton>
         {searchParams?.message && (
           <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
@@ -84,12 +97,12 @@ export default function Login({
           </p>
         )}
         <p className="text-sm text-center">
-          Don't have an account?{' '}
-          <Link href="/signup" className="text-blue-600 hover:underline">
-            Sign up
+          Already have an account?{' '}
+          <Link href="/login" className="text-blue-600 hover:underline">
+            Login
           </Link>
         </p>
       </form>
-    </div>
+    </div >
   );
 }

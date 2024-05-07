@@ -14,6 +14,7 @@ export default function AccountForm({ user }: { user: User | null }) {
   const [bio, setBio] = useState('')
   const [username, setUsername] = useState<string | null>(null)
   const [avatar_url, setAvatarUrl] = useState<string | null>(null)
+  const [userActivePlan, setUserActivePlan] = useState<any>()
 
   const getProfile = useCallback(async () => {
     try {
@@ -22,7 +23,7 @@ export default function AccountForm({ user }: { user: User | null }) {
         .from('profiles')
         .select(`contact_no, user_name, website, avatar_url, bio`)
         .eq('id', user?.id)
-        .single()
+        .maybeSingle()
 
       if (error && status !== 406) {
         console.log(error)
@@ -43,11 +44,29 @@ export default function AccountForm({ user }: { user: User | null }) {
     }
   }, [user, supabase])
 
+  const getSubscriptionPlan = useCallback(async () => {
+    try {
+      const { data, error } = await supabase.from('user_subscriptions').
+        select(`subscription_id`).eq('id', user?.id)
+
+      if (data && data.length) {
+        const { data: userActivePlanData } = await supabase.from('subscription_plans').select(`name`).eq('id', data[0].subscription_id).single()
+
+        setUserActivePlan(userActivePlanData?.name)
+      }
+      if (error) throw error
+    } catch (error) {
+      console.log('error', error)
+      alert('Error loading subscription plans!')
+    }
+  }, [supabase])
+
   useEffect(() => {
     getProfile()
+    getSubscriptionPlan()
   }, [user, getProfile])
 
-  async function updateProfile({ url }: { url: string | null }) {
+  async function updateProfile({ url, redirect }: { url: string | null, redirect?: boolean }) {
     try {
       setLoading(true)
 
@@ -59,7 +78,7 @@ export default function AccountForm({ user }: { user: User | null }) {
         user_name: username
       })
       if (error) throw error
-      router.push("/")
+      if(redirect) router.push("/")
     } catch (error) {
       console.log('error', error)
       alert('Error updating the data!')
@@ -75,9 +94,17 @@ export default function AccountForm({ user }: { user: User | null }) {
           <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-20 w-20"></div>
         </div>
       )}
+      <div className="w-full">
+        <div className="py-6 font-bold bg-purple-950 text-center text-white">
+          {userActivePlan ? `Your Current Active Subscription is ${userActivePlan}` : 'You do not have any active subscription plan'}
+          <Link href="/manage-subscriptions" className="inline-flex items-center ml-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded">
+            Update Subscription Plan
+          </Link>
+        </div>
+      </div>
       <Link
         href="/"
-        className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm"
+        className="absolute left-8 top-24 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +166,7 @@ export default function AccountForm({ user }: { user: User | null }) {
           />
         </div>
         <div>
-          <button className="button block mt-4 bg-indigo-500 text-white py-2 px-4 rounded-md hover:bg-indigo-600 relative" type="submit" onClick={() => updateProfile({ url: avatar_url })}>
+          <button className="button block mt-4 bg-indigo-500 text-white py-2 px-4 rounded-md hover:bg-indigo-600 relative" type="submit" onClick={() => updateProfile({ url: avatar_url, redirect: true })}>
             Submit
           </button>
         </div>

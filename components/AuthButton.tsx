@@ -28,9 +28,12 @@ export default function AuthButton() {
           .from('profiles')
           .select(`avatar_url`)
           .eq('id', user?.id)
-          .single().then(async ({ data }) => {
-            const { data: imageData } = await supabase.storage.from('profile_picture').download(data?.avatar_url)
-            return URL.createObjectURL(imageData!)
+          .maybeSingle().then(async ({ data }) => {
+            if (data) {
+              const { data: imageData } = await supabase.storage.from('profile_picture').download(data?.avatar_url)
+              return URL.createObjectURL(imageData!)
+            }
+            return ''
           })
         setAvatarUrl(avatar)
       } catch (error) {
@@ -49,11 +52,11 @@ export default function AuthButton() {
   return user ? (
     <>
       <div className="flex items-center gap-4">
-        Hey {user.user_metadata.name || user.email}
+        Hey, {user.user_metadata.name || user.email}
         <Link href="/update-profile" className="text-gray-800 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"><Image
           width={40}
           height={40}
-          src={avatarUrl ? avatarUrl : '/user-profile-icon.jpg'}
+          src={avatarUrl ? avatarUrl : '/user-profile.png'}
           alt="Avatar"
           className="avatar image"
           style={{
